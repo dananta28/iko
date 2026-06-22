@@ -25,9 +25,30 @@ nltk.download("stopwords")
 # ===============================
 # TAMPILAN APLIKASI
 # ===============================
-st.markdown("# **Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay**")
+st.markdown("## **Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay**")
 st.write("Menggunakan Label Powerset dan XGBoost")
 
+tab_prediksi, tab_label = st.tabs(["🔍 Analisis", "🏷️ Daftar Label"])
+
+with tab_prediksi:
+    text_input = st.text_area("Masukkan Teks Ulasan")
+    submit = st.button("Submit", type="primary")
+
+with tab_label:
+    st.markdown("#### 🏷️ Daftar Label Powerset")
+    model, vectorizer, le_lp, mlb = load_artifacts()
+    
+    tabel_label = []
+    for i, kelas in enumerate(le_lp.classes_):
+        bits = [int(b) for b in kelas.split("_")]
+        nama = [mlb.classes_[j] for j, b in enumerate(bits) if b == 1]
+        tabel_label.append({
+            "Label Powerset": i + 1,
+            "Label Encode": kelas,
+            "Aspek & Sentimen": ", ".join(nama)
+        })
+    
+    st.dataframe(pd.DataFrame(tabel_label), use_container_width=True, hide_index=True)
 text_input = st.text_area("Masukkan Teks Ulasan")
 submit = st.button("Submit", type="primary")
 
