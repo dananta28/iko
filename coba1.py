@@ -76,6 +76,10 @@ def preprocessing(teks: str) -> str:
 # ─────────────────────────────────────────────────────────────────────
 # MEMUAT MODEL & ARTEFAK (di-cache agar tidak diulang setiap interaksi)
 # ─────────────────────────────────────────────────────────────────────
+def load_pickle_from_github(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return pickle.load(BytesIO(response.content))
 @st.cache_resource
 def load_artifacts():
     model_url = "https://raw.githubusercontent.com/dananta28/iko/main/model_xgboost1.pkl"
