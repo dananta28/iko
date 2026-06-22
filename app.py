@@ -44,7 +44,7 @@ def load_pickle_from_github(url):
 def load_artifacts():
     model_url = "https://raw.githubusercontent.com/dananta28/iko/main/model_xgboost1.pkl"
     vectorizer_url = "https://raw.githubusercontent.com/dananta28/iko/main/vectorizer_baru.pkl"
-    le_url = "https://raw.githubusercontent.com/dananta28/iko/main/label_encoder_lp%20(2).pkl"
+    le_url = "https://raw.githubusercontent.com/dananta28/iko/main/le_lp.pkl"
     mlb_url = "https://raw.githubusercontent.com/dananta28/iko/main/mlb%20(1).pkl"
 
     model = load_pickle_from_github(model_url)
