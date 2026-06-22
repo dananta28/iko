@@ -48,6 +48,12 @@ try:
 except Exception as e:
     st.error(f"requests gagal di-import: {e}")
 
+try:
+    import streamlit as _st
+    st.success(f"streamlit: {_st.__version__}")
+except Exception as e:
+    st.error(f"streamlit gagal di-import: {e}")
+
 st.divider()
 st.subheader("Tes input sederhana")
 nama = st.text_input("Coba ketik sesuatu")
