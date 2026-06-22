@@ -23,37 +23,6 @@ nltk.download("stopwords")
 
 
 # ===============================
-# TAMPILAN APLIKASI
-# ===============================
-st.markdown("## **Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay**")
-st.write("Menggunakan Label Powerset dan XGBoost")
-
-tab_prediksi, tab_label = st.tabs(["🔍 Analisis", "🏷️ Daftar Label"])
-
-with tab_prediksi:
-    text_input = st.text_area("Masukkan Teks Ulasan")
-    submit = st.button("Submit", type="primary")
-
-with tab_label:
-    st.markdown("#### 🏷️ Daftar Label Powerset")
-    model, vectorizer, le_lp, mlb = load_artifacts()
-    
-    tabel_label = []
-    for i, kelas in enumerate(le_lp.classes_):
-        bits = [int(b) for b in kelas.split("_")]
-        nama = [mlb.classes_[j] for j, b in enumerate(bits) if b == 1]
-        tabel_label.append({
-            "Label Powerset": i + 1,
-            "Label Encode": kelas,
-            "Aspek & Sentimen": ", ".join(nama)
-        })
-    
-    st.dataframe(pd.DataFrame(tabel_label), use_container_width=True, hide_index=True)
-text_input = st.text_area("Masukkan Teks Ulasan")
-submit = st.button("Submit", type="primary")
-
-
-# ===============================
 # LOAD FILE DARI GITHUB
 # ===============================
 def load_pickle_from_github(url):
@@ -168,66 +137,98 @@ def decode_label_powerset(kode_str, mlb):
 
 
 # ===============================
-# PROSES UTAMA
+# TAMPILAN APLIKASI
 # ===============================
-if submit:
-    if text_input.strip() == "":
-        st.warning("Kamu belum memasukkan teks ulasan 😊")
+st.markdown("## **Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay**")
+st.write("Menggunakan Label Powerset dan XGBoost")
 
-    else:
-        with st.spinner("Memproses ulasan..."):
+tab_prediksi, tab_label = st.tabs(["🔍 Analisis", "🏷️ Daftar Label"])
 
-            kamus_normalisasi = load_kamus_normalisasi()
-            stemmer = load_stemmer()
-            model, vectorizer, le_lp, mlb = load_artifacts()
+# ===============================
+# TAB 1: PREDIKSI
+# ===============================
+with tab_prediksi:
+    text_input = st.text_area("Masukkan Teks Ulasan")
+    submit = st.button("Submit", type="primary")
 
-            df_mentah = pd.DataFrame({"ulasan": [text_input]})
+    if submit:
+        if text_input.strip() == "":
+            st.warning("Kamu belum memasukkan teks ulasan 😊")
 
-            df_mentah["Case Folding"] = df_mentah["ulasan"].apply(case_folding)
+        else:
+            with st.spinner("Memproses ulasan..."):
 
-            df_mentah["Remove Punctuation"] = df_mentah["Case Folding"].apply(
-                remove_punctuation
-            )
+                kamus_normalisasi = load_kamus_normalisasi()
+                stemmer = load_stemmer()
+                model, vectorizer, le_lp, mlb = load_artifacts()
 
-            df_mentah["Tokenized"] = df_mentah["Remove Punctuation"].apply(tokenize)
+                df_mentah = pd.DataFrame({"ulasan": [text_input]})
 
-            df_mentah["Normalisasi"] = df_mentah["Tokenized"].apply(
-                lambda x: normalization(x, kamus_normalisasi)
-            )
+                df_mentah["Case Folding"] = df_mentah["ulasan"].apply(case_folding)
 
-            df_mentah["Stopword Removal"] = df_mentah["Normalisasi"].apply(
-                remove_stopword
-            )
+                df_mentah["Remove Punctuation"] = df_mentah["Case Folding"].apply(
+                    remove_punctuation
+                )
 
-            df_mentah["Stemming"] = df_mentah["Stopword Removal"].apply(
-                lambda x: stemming(x, stemmer)
-            )
+                df_mentah["Tokenized"] = df_mentah["Remove Punctuation"].apply(tokenize)
 
-            df_mentah["HasilProcessing"] = df_mentah["Stemming"].apply(
-                lambda x: " ".join(x)
-            )
+                df_mentah["Normalisasi"] = df_mentah["Tokenized"].apply(
+                    lambda x: normalization(x, kamus_normalisasi)
+                )
 
-            X_input = vectorizer.transform(df_mentah["HasilProcessing"])
+                df_mentah["Stopword Removal"] = df_mentah["Normalisasi"].apply(
+                    remove_stopword
+                )
 
-            y_pred_enc = model.predict(X_input)
+                df_mentah["Stemming"] = df_mentah["Stopword Removal"].apply(
+                    lambda x: stemming(x, stemmer)
+                )
 
-            y_pred_str = le_lp.inverse_transform(y_pred_enc)[0]
+                df_mentah["HasilProcessing"] = df_mentah["Stemming"].apply(
+                    lambda x: " ".join(x)
+                )
 
-            hasil_label = decode_label_powerset(y_pred_str, mlb)
+                X_input = vectorizer.transform(df_mentah["HasilProcessing"])
 
-        st.success("Prediksi selesai!")
+                y_pred_enc = model.predict(X_input)
 
-        st.subheader("Hasil Prediksi")
-        st.write(f'Ulasan: **"{text_input}"**')
-        st.write(f"Hasil Prediksi Aspek dan Sentimen: **{hasil_label}**")
-        st.write(f"Label Powerset: `{y_pred_str}`")
-        st.write(f"Label Powerset: `{y_pred_enc[0]}`")
+                y_pred_str = le_lp.inverse_transform(y_pred_enc)[0]
 
-        with st.expander("Lihat Detail Preprocessing"):
-            st.write("Case Folding:", df_mentah["Case Folding"].iloc[0])
-            st.write("Remove Punctuation:", df_mentah["Remove Punctuation"].iloc[0])
-            st.write("Tokenized:", df_mentah["Tokenized"].iloc[0])
-            st.write("Normalisasi:", df_mentah["Normalisasi"].iloc[0])
-            st.write("Stopword Removal:", df_mentah["Stopword Removal"].iloc[0])
-            st.write("Stemming:", df_mentah["Stemming"].iloc[0])
-            st.write("Hasil Akhir:", df_mentah["HasilProcessing"].iloc[0])
+                hasil_label = decode_label_powerset(y_pred_str, mlb)
+
+            st.success("Prediksi selesai!")
+
+            st.subheader("Hasil Prediksi")
+            st.write(f'Ulasan: **"{text_input}"**')
+            st.write(f"Hasil Prediksi Aspek dan Sentimen: **{hasil_label}**")
+            st.write(f"Label Encode: `{y_pred_str}`")
+            st.write(f"Label Powerset: `{y_pred_enc[0] + 1}`")
+
+            with st.expander("Lihat Detail Preprocessing"):
+                st.write("Case Folding:", df_mentah["Case Folding"].iloc[0])
+                st.write("Remove Punctuation:", df_mentah["Remove Punctuation"].iloc[0])
+                st.write("Tokenized:", df_mentah["Tokenized"].iloc[0])
+                st.write("Normalisasi:", df_mentah["Normalisasi"].iloc[0])
+                st.write("Stopword Removal:", df_mentah["Stopword Removal"].iloc[0])
+                st.write("Stemming:", df_mentah["Stemming"].iloc[0])
+                st.write("Hasil Akhir:", df_mentah["HasilProcessing"].iloc[0])
+
+# ===============================
+# TAB 2: DAFTAR LABEL
+# ===============================
+with tab_label:
+    st.markdown("#### 🏷️ Daftar Label Powerset")
+
+    model, vectorizer, le_lp, mlb = load_artifacts()
+
+    tabel_label = []
+    for i, kelas in enumerate(le_lp.classes_):
+        bits = [int(b) for b in kelas.split("_")]
+        nama = [mlb.classes_[j] for j, b in enumerate(bits) if b == 1]
+        tabel_label.append({
+            "Label Powerset": i + 1,
+            "Label Encode": kelas,
+            "Aspek & Sentimen": ", ".join(nama)
+        })
+
+    st.dataframe(pd.DataFrame(tabel_label), use_container_width=True, hide_index=True)
