@@ -42,10 +42,10 @@ def load_pickle_from_github(url):
 
 @st.cache_resource
 def load_artifacts():
-    model_url = "https://raw.githubusercontent.com/dananta28/tugasakhir/main/model_xgboost1.pkl"
-    vectorizer_url = "https://raw.githubusercontent.com/dananta28/tugasakhir/main/vectorizer%20(3).pkl"
-    le_url = "https://raw.githubusercontent.com/dananta28/tugasakhir/main/label_encoder_lp%20(2).pkl"
-    mlb_url = "https://raw.githubusercontent.com/dananta28/tugasakhir/main/mlb%20(1).pkl"
+    model_url = "https://raw.githubusercontent.com/dananta28/iko/main/model_xgboost1.pkl"
+    vectorizer_url = "https://raw.githubusercontent.com/dananta28/iko/main/vectorizer%20(3).pkl"
+    le_url = "https://raw.githubusercontent.com/dananta28/iko/main/label_encoder_lp%20(2).pkl"
+    mlb_url = "https://raw.githubusercontent.com/dananta28/iko/main/mlb%20(1).pkl"
 
     model = load_pickle_from_github(model_url)
     vectorizer = load_pickle_from_github(vectorizer_url)
@@ -57,7 +57,7 @@ def load_artifacts():
 
 @st.cache_data
 def load_kamus_normalisasi():
-    url = "https://raw.githubusercontent.com/dananta28/tugasakhir/main/colloquial-indonesian-lexicon%20(3).csv"
+    url = "https://raw.githubusercontent.com/dananta28/iko/main/colloquial-indonesian-lexicon%20(3).csv"
 
     kamus = pd.read_csv(url)
     kamus = kamus.drop(
