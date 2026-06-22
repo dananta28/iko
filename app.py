@@ -25,7 +25,7 @@ nltk.download("stopwords")
 # ===============================
 # TAMPILAN APLIKASI
 # ===============================
-st.header("Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay")
+st.markdown("# **Analisis Sentimen Berbasis Aspek Ulasan Bebek Sinjay**")
 st.write("Menggunakan Label Powerset dan XGBoost")
 
 text_input = st.text_area("Masukkan Teks Ulasan")
@@ -200,6 +200,7 @@ if submit:
         st.write(f'Ulasan: **"{text_input}"**')
         st.write(f"Hasil Prediksi Aspek dan Sentimen: **{hasil_label}**")
         st.write(f"Label Powerset: `{y_pred_str}`")
+        st.write(f"Label Powerset: `{y_pred_enc[0]}`")
 
         with st.expander("Lihat Detail Preprocessing"):
             st.write("Case Folding:", df_mentah["Case Folding"].iloc[0])
